@@ -15,7 +15,6 @@ const todo = (state, action) => {
       if (state.id !== action.id) {
         return state;
       }
-      console.log(state);
       return {
         id: state.id,
         text: state.text,
@@ -40,7 +39,6 @@ const todos = (state=[], action) => {
 };
 
 const visibilityFilter = (state='SHOW_ALL', action) => {
-  console.log('filterlink invoked for ' + action.filter)
   switch (action.type) {
     case 'SET_VISIBILITY_FILTER':
       return action.filter;
@@ -49,9 +47,7 @@ const visibilityFilter = (state='SHOW_ALL', action) => {
   }
 };
 
-const todoApp = combineReducers({
-  todos, visibilityFilter
-});
+const todoApp = combineReducers({todos, visibilityFilter});
 
 const store = createStore(todoApp);
 
@@ -60,13 +56,13 @@ const FilterLink = ({filter, currentFilter, children}) => {
     return <span>{children}</span>
   }
   return (
-    <a href='#' onclick={e => {
+    <a href='#' onClick={e => {
       e.preventDefault();
       store.dispatch({
         type: 'SET_VISIBILITY_FILTER',
         filter
-      })
-    }}>{children}</a>
+      });
+    }} >{children}</a>
   );
 };
 
@@ -74,12 +70,12 @@ const getVisibleTodos = (todos, filter) => {
   switch (filter) {
     case 'SHOW_COMPLETED':
       return todos.filter(
-        t=>t.completed
+        t => t.completed
       );
     case 'SHOW_ACTIVE':
       return todos.filter(
-        t=>!t.completed
-      )
+        t => !t.completed
+      );
     default:
       return todos;
   }
@@ -90,7 +86,7 @@ let nextTodoId = 0;
 class TodoApp extends React.Component {
   render() {
     const {todos, visibilityFilter} = this.props;
-    const visibleTodos = getVisibleTodos(this.props.todos, visibilityFilter);
+    const visibleTodos = getVisibleTodos(todos, visibilityFilter);
     return (
       <div>
         <input ref={node => {
@@ -134,9 +130,8 @@ class TodoApp extends React.Component {
 }
 
 const render = () => {
-  console.log(store.getState());
   ReactDOM.render(
-    <TodoApp todos={store.getState().todos}/>,
+    <TodoApp {...store.getState()} />,
     document.getElementById('root')
   )
 };
