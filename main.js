@@ -49,7 +49,7 @@ const visibilityFilter = (state='SHOW_ALL', action) => {
 
 const todoApp = combineReducers({todos, visibilityFilter});
 
-const store = createStore(todoApp);
+//const store = createStore(todoApp);
 
 const Link = ({ active, children, onClick }) => {
   if (active) {
@@ -65,6 +65,7 @@ const Link = ({ active, children, onClick }) => {
 
 class FilterLink extends React.Component {
   componentDidMount() {
+    const {store} = this.props;
     this.unsubscribe = store.subscribe(() =>
       this.forceUpdate()
     );
@@ -74,6 +75,7 @@ class FilterLink extends React.Component {
   }
   render() {
     const props = this.props;
+    const {store} = this.props;
     const state = store.getState();
     return (
       <Link active={ props.filter === state.visibilityFilter }
@@ -88,12 +90,12 @@ class FilterLink extends React.Component {
   }
 }
 
-const Footer = ({visibilityFilter, onFilterClick}) => (
+const Footer = ({store}) => (
   <p>
     Show:
-    {' '} <FilterLink filter='SHOW_ALL'>All</FilterLink>
-    {' '} <FilterLink filter='SHOW_ACTIVE'>Active</FilterLink>
-    {' '} <FilterLink filter='SHOW_COMPLETED'>Completed</FilterLink>
+    {' '} <FilterLink store={store} filter='SHOW_ALL'>All</FilterLink>
+    {' '} <FilterLink store={store} filter='SHOW_ACTIVE'>Active</FilterLink>
+    {' '} <FilterLink store={store} filter='SHOW_COMPLETED'>Completed</FilterLink>
   </p>
 )
 
@@ -114,7 +116,7 @@ const TodoList = ({ todos, onTodoClick }) => (
   </ul>
 )
 
-const AddTodo = ({onAddClick}) => {
+const AddTodo = ({store}) => {
   let input;
   return (
     <div>
@@ -152,6 +154,7 @@ const getVisibleTodos = (todos, filter) => {
 
 class VisibleTodoList extends React.Component {
   componentDidMount() {
+    const {store} = this.props
     this.unsubscribe = store.subscribe(() =>
       this.forceUpdate()
     );
@@ -161,6 +164,7 @@ class VisibleTodoList extends React.Component {
   }
   render() {
     const props = this.props;
+    const { store } = props;
     const state = store.getState();
 
     return (
@@ -175,11 +179,11 @@ class VisibleTodoList extends React.Component {
 }
 
 let nextTodoId = 0;
-const TodoApp = () => (
+const TodoApp = ({ store }) => (
   <div>
-    <AddTodo />
-    <VisibleTodoList />
-    <Footer visibilityFilter={visibilityFilter} onFilterClick={filter =>
+    <AddTodo store={store}/>
+    <VisibleTodoList store={store} />
+    <Footer store={store} visibilityFilter={visibilityFilter} onFilterClick={filter =>
       store.dispatch({
         type: 'SET_VISIBILITY_FILTER',
         filter
@@ -189,6 +193,6 @@ const TodoApp = () => (
 );
 
 ReactDOM.render(
-  <TodoApp {...store.getState()} />,
+  <TodoApp store={createStore(todoApp)} />,
   document.getElementById('root')
 );
